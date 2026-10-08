@@ -37,6 +37,14 @@ public class DeviceController {
 
     @PutMapping("/{deviceId}")
     public ApiResponse<Device> updateDevice(
+            @PathVariable Long deviceId,
+            @Valid @RequestBody DeviceRequest request) {
+        return ApiResponse.success(deviceService.updateDevice(deviceId, request));
+    }
 
-    )
+    @DeleteMapping("/{deviceId}")
+    public ApiResponse<Void> deleteDevice(@PathVariable Long deviceId) {
+        deviceService.deleteDevice(deviceId);
+        return ApiResponse.success(null);
+    }
 }
