@@ -2,6 +2,7 @@ package com.devicelife.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import com.devicelife.dto.UpdateUserRequest;
 
 @Data
 public class RegisterRequest {

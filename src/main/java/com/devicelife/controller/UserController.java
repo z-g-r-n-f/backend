@@ -9,6 +9,7 @@ import com.devicelife.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import com.devicelife.dto.UpdateUserRequest;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,6 +30,13 @@ public class UserController {
     @GetMapping("/{userId}")
     public ApiResponse<User> getById(@PathVariable Long userId) {
         return ApiResponse.success(userService.getById(userId));
+    }
+
+    @PutMapping("/{userId}")
+    public ApiResponse<User> updateUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateUserRequest request) {
+        return ApiResponse.success(userService.updateUser(userId, request));
     }
 
 }
