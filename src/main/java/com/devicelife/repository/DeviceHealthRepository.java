@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface DeviceHealthRepository extends JpaRepository<DeviceHealth, Long> {
     Optional<DeviceHealth> findTopByDeviceIdOrderByCheckedAtDesc(Long deviceId);
+    long countByDeviceId(Long deviceId);
 }

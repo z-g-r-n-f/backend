@@ -2,8 +2,12 @@ package com.devicelife.service;
 
 import com.devicelife.dto.DeviceRequest;
 import com.devicelife.entity.Device;
+import com.devicelife.exception.BusinessException;
 import com.devicelife.exception.ResourceNotFoundException;
+import com.devicelife.repository.DeviceEventRepository;
+import com.devicelife.repository.DeviceHealthRepository;
 import com.devicelife.repository.DeviceRepository;
+import com.devicelife.repository.DeviceUsageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +19,9 @@ import java.util.List;
 public class DeviceService {
 
     private final DeviceRepository deviceRepository;
+    private final DeviceEventRepository eventRepository;
+    private final DeviceHealthRepository healthRepository;
+    private final DeviceUsageRepository usageRepository;
 
     public List<Device> getDevicesByUser(Long userId) {
         return deviceRepository.findByUserId(userId);   // ← 注意 UserId 大小写
@@ -22,6 +29,12 @@ public class DeviceService {
 
     public Device getDevice(Long deviceId) {
         return deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "기기가 존재하지 않습니다. id=" + deviceId));
+    }
+
+    public Device getDeviceForUser(Long deviceId, Long userId) {
+        return deviceRepository.findByDeviceIdAndUserId(deviceId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "기기가 존재하지 않습니다. id=" + deviceId));
     }
@@ -35,16 +48,19 @@ public class DeviceService {
     }
 
     @Transactional
-    public Device updateDevice(Long deviceId, DeviceRequest r) {
-        Device device = getDevice(deviceId);
+    public Device updateDevice(Long deviceId, Long userId, DeviceRequest r) {
+        Device device = getDeviceForUser(deviceId, userId);
         applyRequest(device, r);
         return deviceRepository.save(device);
     }
 
     @Transactional
-    public void deleteDevice(Long deviceId) {
-        if (!deviceRepository.existsById(deviceId)) {
-            throw new ResourceNotFoundException("기기가 존재하지 않습니다. id=" + deviceId);
+    public void deleteDevice(Long deviceId, Long userId) {
+        getDeviceForUser(deviceId, userId);
+        if (eventRepository.countByDeviceId(deviceId) > 0
+                || healthRepository.countByDeviceId(deviceId) > 0
+                || usageRepository.countByDeviceId(deviceId) > 0) {
+            throw new BusinessException("该设备存在历史记录，已阻止删除以保留生命周期数据。");
         }
         deviceRepository.deleteById(deviceId);
     }

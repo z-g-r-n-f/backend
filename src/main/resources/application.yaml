@@ -6,7 +6,7 @@ spring:
     name: device-lifecycle
 
   datasource:
-    url: jdbc:mysql://mysql-2f6879c2-devicelife.l.aivencloud.com:11624/defaultdb?useSSL=true&requireSSL=true&verifyServerCertificate=true&trustCertificateKeyStoreUrl=classpath:truststore.jks&trustCertificateKeyStorePassword=changeit&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://mysql-2f6879c2-devicelife.l.aivencloud.com:11624/defaultdb?useSSL=true&requireSSL=true&verifyServerCertificate=true&trustCertificateKeyStoreUrl=file:src/main/resources/truststore.jks&trustCertificateKeyStorePassword=changeit&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
     username: div
     password: AVNS_933VseuBKAERM5UnlN2
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -23,3 +23,9 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Seoul
+
+groq:
+  base-url: https://api.groq.com/openai/v1
+  api-key:
+  model: openai/gpt-oss-20b
+  timeout-ms: 15000

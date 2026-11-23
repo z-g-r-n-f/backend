@@ -31,4 +31,10 @@ Content-Type: application/json
 }
 
 ### 4. 查设备总花费
-GET http://localhost:8080/api/devices/1/total-cost
+GET http://localhost:8080/api/devices/1/total-cost?userId=1
+
+### 5. Dashboard
+GET http://localhost:8080/api/dashboard?userId=1
+
+### 6. PowerShell 写入后生成设备报告
+GET http://localhost:8080/api/devices/1/analysis?userId=1

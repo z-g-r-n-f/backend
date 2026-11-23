@@ -13,13 +13,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeviceUsageService {
     private final DeviceUsageRepository usageRepository;
+    private final DeviceService deviceService;
 
-    public List<DeviceUsage> getByDevice(Long deviceId) {
+    public List<DeviceUsage> getByDevice(Long deviceId, Long userId) {
+        deviceService.getDeviceForUser(deviceId, userId);
         return usageRepository.findByDeviceIdOrderByUsageDateDesc(deviceId);
     }
 
     @Transactional
-    public DeviceUsage save(Long deviceId, DeviceUsageRequest r) {
+    public DeviceUsage save(Long deviceId, Long userId, DeviceUsageRequest r) {
+        deviceService.getDeviceForUser(deviceId, userId);
         DeviceUsage u = new DeviceUsage();
         u.setDeviceId(deviceId);
         u.setUsageDate(r.getUsageDate());

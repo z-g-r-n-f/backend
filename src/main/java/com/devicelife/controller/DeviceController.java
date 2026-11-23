@@ -23,8 +23,8 @@ public class DeviceController {
     }
 
     @GetMapping("/{deviceId}")
-    public ApiResponse<Device> getDevice(@PathVariable Long deviceId) {
-        return ApiResponse.success(deviceService.getDevice(deviceId));
+    public ApiResponse<Device> getDevice(@PathVariable Long deviceId, @RequestParam Long userId) {
+        return ApiResponse.success(deviceService.getDeviceForUser(deviceId, userId));
     }
 
     @PostMapping
@@ -38,13 +38,14 @@ public class DeviceController {
     @PutMapping("/{deviceId}")
     public ApiResponse<Device> updateDevice(
             @PathVariable Long deviceId,
+            @RequestParam Long userId,
             @Valid @RequestBody DeviceRequest request) {
-        return ApiResponse.success(deviceService.updateDevice(deviceId, request));
+        return ApiResponse.success(deviceService.updateDevice(deviceId, userId, request));
     }
 
     @DeleteMapping("/{deviceId}")
-    public ApiResponse<Void> deleteDevice(@PathVariable Long deviceId) {
-        deviceService.deleteDevice(deviceId);
+    public ApiResponse<Void> deleteDevice(@PathVariable Long deviceId, @RequestParam Long userId) {
+        deviceService.deleteDevice(deviceId, userId);
         return ApiResponse.success(null);
     }
 }

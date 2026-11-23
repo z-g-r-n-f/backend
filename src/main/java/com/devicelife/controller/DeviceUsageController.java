@@ -17,14 +17,15 @@ public class DeviceUsageController {
     private final DeviceUsageService usageService;
 
     @GetMapping
-    public ApiResponse<List<DeviceUsage>> list(@PathVariable Long deviceId) {
-        return ApiResponse.success(usageService.getByDevice(deviceId));
+    public ApiResponse<List<DeviceUsage>> list(@PathVariable Long deviceId, @RequestParam Long userId) {
+        return ApiResponse.success(usageService.getByDevice(deviceId, userId));
     }
 
     @PostMapping
     public ApiResponse<DeviceUsage> save(
             @PathVariable Long deviceId,
+            @RequestParam Long userId,
             @Valid @RequestBody DeviceUsageRequest request) {
-        return ApiResponse.success(usageService.save(deviceId, request));
+        return ApiResponse.success(usageService.save(deviceId, userId, request));
     }
 }

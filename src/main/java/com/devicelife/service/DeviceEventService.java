@@ -16,63 +16,72 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeviceEventService {
     private final DeviceEventRepository eventRepository;
+    private final DeviceService deviceService;
 
-    public  List<DeviceEvent> getEventsByDevice(Long deviceId) {
+    public List<DeviceEvent> getEventsByDevice(Long deviceId, Long userId) {
+        deviceService.getDeviceForUser(deviceId, userId);
         return eventRepository.findByDeviceIdOrderByEventDateDesc(deviceId);
     }
 
-    public List<DeviceEvent> getRepairHistory(Long deviceId) {
+    public List<DeviceEvent> getRepairHistory(Long deviceId, Long userId) {
+        deviceService.getDeviceForUser(deviceId, userId);
         return eventRepository.findByDeviceIdAndEventType(deviceId, "REPAIR");
     }
 
-    public List<DeviceEvent> getUpgradeHistory(Long deviceId) {
+    public List<DeviceEvent> getUpgradeHistory(Long deviceId, Long userId) {
+        deviceService.getDeviceForUser(deviceId, userId);
         return eventRepository.findByDeviceIdAndEventType(deviceId, "UPGRADE");
     }
 
-    public List<DeviceEvent> getMaintenanceHistory(Long deviceId) {
+    public List<DeviceEvent> getMaintenanceHistory(Long deviceId, Long userId) {
+        deviceService.getDeviceForUser(deviceId, userId);
         return eventRepository.findByDeviceIdAndEventType(deviceId, "MAINTENANCE");
     }
 
-    public BigDecimal getTotalCost(Long deviceId) {
-        return eventRepository.findByDeviceIdOrderByEventDateDesc(deviceId).stream()
+    public BigDecimal getTotalCost(Long deviceId, Long userId) {
+        return getEventsByDevice(deviceId, userId).stream()
                 .map(e -> e.getCost() == null ? BigDecimal.ZERO : e.getCost())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Transactional
-    public DeviceEvent addRepair(Long deviceId, DeviceEventRequest r) {
-        return addTyped(deviceId, r, "REPAIR");
+    public DeviceEvent addRepair(Long deviceId, Long userId, DeviceEventRequest r) {
+        return addTyped(deviceId, userId, r, "REPAIR");
     }
 
     @Transactional
-    public DeviceEvent addUpgrade(Long deviceId, DeviceEventRequest r) {
-        return addTyped(deviceId, r, "UPGRADE");
+    public DeviceEvent addUpgrade(Long deviceId, Long userId, DeviceEventRequest r) {
+        return addTyped(deviceId, userId, r, "UPGRADE");
     }
 
     @Transactional
-    public DeviceEvent addMaintenance(Long deviceId, DeviceEventRequest r) {
-        return addTyped(deviceId, r, "MAINTENANCE");
+    public DeviceEvent addMaintenance(Long deviceId, Long userId, DeviceEventRequest r) {
+        return addTyped(deviceId, userId, r, "MAINTENANCE");
     }
 
     @Transactional
-    public DeviceEvent createEvent(Long deviceId, DeviceEventRequest r) {
+    public DeviceEvent createEvent(Long deviceId, Long userId, DeviceEventRequest r) {
         if (r.getEventType() == null) {
             throw new BusinessException("이벤트 유형이 필요합니다.");
         }
+        deviceService.getDeviceForUser(deviceId, userId);
         DeviceEvent e = toEntity(r);
         e.setDeviceId(deviceId);
         return eventRepository.save(e);
     }
 
     @Transactional
-    public void deleteEvent(Long eventId) {
-        if (!eventRepository.existsById(eventId)) {
+    public void deleteEvent(Long deviceId, Long eventId, Long userId) {
+        DeviceEvent event = eventRepository.findById(eventId).orElse(null);
+        if (event == null || !deviceId.equals(event.getDeviceId())) {
             throw new ResourceNotFoundException("이벤트가 존재하지 않습니다. id=" + eventId);
         }
+        deviceService.getDeviceForUser(deviceId, userId);
         eventRepository.deleteById(eventId);
     }
 
-    private DeviceEvent addTyped(Long deviceId, DeviceEventRequest r, String type) {
+    private DeviceEvent addTyped(Long deviceId, Long userId, DeviceEventRequest r, String type) {
+        deviceService.getDeviceForUser(deviceId, userId);
         DeviceEvent e = toEntity(r);
         e.setDeviceId(deviceId);
         e.setEventType(type);

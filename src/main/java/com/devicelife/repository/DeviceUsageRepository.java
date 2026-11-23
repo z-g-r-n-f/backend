@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface DeviceUsageRepository extends JpaRepository<DeviceUsage, Long> {
     List<DeviceUsage> findByDeviceIdOrderByUsageDateDesc(Long deviceId);
+    long countByDeviceId(Long deviceId);
 }

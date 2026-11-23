@@ -15,14 +15,15 @@ public class DeviceHealthController {
     private final DeviceHealthService healthService;
 
     @GetMapping
-    public ApiResponse<DeviceHealth> getLatest(@PathVariable Long deviceId) {
-        return ApiResponse.success(healthService.getLatest(deviceId));
+    public ApiResponse<DeviceHealth> getLatest(@PathVariable Long deviceId, @RequestParam Long userId) {
+        return ApiResponse.success(healthService.getLatest(deviceId, userId));
     }
 
     @PostMapping
     public ApiResponse<DeviceHealth> upload(
             @PathVariable Long deviceId,
+            @RequestParam Long userId,
             @Valid @RequestBody DeviceHealthRequest request) {
-        return ApiResponse.success(healthService.saveHealth(deviceId, request));
+        return ApiResponse.success(healthService.saveHealth(deviceId, userId, request));
     }
 }

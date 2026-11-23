@@ -13,14 +13,17 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class DeviceHealthService {
     private final DeviceHealthRepository healthRepository;
+    private final DeviceService deviceService;
 
-    public DeviceHealth getLatest(Long deviceId) {
+    public DeviceHealth getLatest(Long deviceId, Long userId) {
+        deviceService.getDeviceForUser(deviceId, userId);
         return healthRepository.findTopByDeviceIdOrderByCheckedAtDesc(deviceId)
                 .orElseThrow(() -> new ResourceNotFoundException("건강 기록이 없습니다."));
     }
 
     @Transactional
-    public DeviceHealth saveHealth(Long deviceId, DeviceHealthRequest r) {
+    public DeviceHealth saveHealth(Long deviceId, Long userId, DeviceHealthRequest r) {
+        deviceService.getDeviceForUser(deviceId, userId);
         DeviceHealth h = new DeviceHealth();
         h.setDeviceId(deviceId);
         h.setCpuUsage(r.getCpuUsage());
